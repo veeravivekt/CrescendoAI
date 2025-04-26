@@ -4,6 +4,7 @@ import { ReactNode, useState } from 'react';
 import { Settings, Home, BarChart2, PieChart, X } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BehavioralInsights } from './BehavioralInsights';
 
 interface LayoutProps {
   children: ReactNode;
@@ -27,10 +28,6 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Password</span>
             <button className="text-sm text-blue-600 hover:text-blue-700">Change</button>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Subscription</span>
-            <span className="text-sm font-medium">Free Plan</span>
           </div>
         </div>
       </div>
@@ -182,10 +179,10 @@ export function Layout({ children }: LayoutProps) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-16 right-4 bg-white rounded-lg shadow-lg p-0 w-[480px] z-50 flex"
+            className="fixed top-16 right-4 bg-white rounded-lg shadow-lg p-0 w-[640px] z-50 flex"
           >
             {/* Sidebar */}
-            <div className="w-48 border-r p-6 bg-gray-50">
+            <div className="w-56 border-r p-6 bg-gray-50">
               <h3 className="font-semibold text-gray-900 mb-6">Settings</h3>
               <div className="space-y-1">
                 <button
@@ -219,6 +216,16 @@ export function Layout({ children }: LayoutProps) {
                   Notifications
                 </button>
                 <button
+                  onClick={() => setSelectedSetting('behavioral')}
+                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                    selectedSetting === 'behavioral'
+                      ? 'bg-white text-blue-700 font-medium shadow-sm'
+                      : 'hover:bg-white/50'
+                  }`}
+                >
+                  Behavioral Insights
+                </button>
+                <button
                   onClick={() => setSelectedSetting('help')}
                   className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
                     selectedSetting === 'help'
@@ -238,8 +245,12 @@ export function Layout({ children }: LayoutProps) {
               >
                 <X className="w-5 h-5" />
               </button>
-              <div className="max-w-[320px]">
-                {settingsContent[selectedSetting as keyof typeof settingsContent]}
+              <div className="max-w-[480px]">
+                {selectedSetting === 'behavioral' ? (
+                  <BehavioralInsights />
+                ) : (
+                  settingsContent[selectedSetting as keyof typeof settingsContent]
+                )}
               </div>
             </div>
           </motion.div>
