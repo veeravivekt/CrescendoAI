@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MoodWheel } from './MoodWheel';
-import { Slider } from './ui/slider';
-import { Textarea } from './ui/textarea';
-import { Button } from './ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 interface DailyCheckInProps {
   onComplete: (data: CheckInData) => void;

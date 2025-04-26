@@ -9,7 +9,6 @@ import { Player } from '@/components/Player';
 import { SettingsDrawer } from '@/components/SettingsDrawer';
 import { FeedbackRow } from '@/components/FeedbackRow';
 import { Layout } from '@/components/Layout';
-import { DailyCheckIn } from '@/components/DailyCheckIn';
 import { BreathingExercise } from '@/components/BreathingExercise';
 import { Search, List } from 'lucide-react';
 
@@ -66,6 +65,32 @@ export default function Home() {
     setIsSearchOpen(false);
   };
 
+  const handleLike = () => {
+    // TODO: Implement like functionality
+    console.log('Liked track:', currentTrack?.title);
+  };
+
+  const handleDislike = () => {
+    // TODO: Implement dislike functionality
+    console.log('Disliked track:', currentTrack?.title);
+  };
+
+  const handleNeverPlay = () => {
+    // TODO: Implement never play functionality
+    console.log('Never play track:', currentTrack?.title);
+    // Remove the track from the queue
+    if (currentTrack) {
+      const newQueue = queue.filter(track => track.id !== currentTrack.id);
+      setQueue(newQueue);
+      // If there are tracks left, play the next one
+      if (newQueue.length > 0) {
+        setCurrentTrack(newQueue[0]);
+      } else {
+        setCurrentTrack(undefined);
+      }
+    }
+  };
+
   return (
     <Layout>
       <main className="min-h-screen bg-gray-50">
@@ -119,7 +144,11 @@ export default function Home() {
                   }
                 }}
               />
-              <FeedbackRow />
+              <FeedbackRow
+                onLike={handleLike}
+                onDislike={handleDislike}
+                onNeverPlay={handleNeverPlay}
+              />
             </div>
           </div>
         </div>

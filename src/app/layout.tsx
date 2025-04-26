@@ -1,7 +1,5 @@
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
-import { TutorialOverlay } from '@/components/TutorialOverlay';
-import { useState } from 'react';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
