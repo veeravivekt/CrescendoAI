@@ -1,12 +1,17 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
 from pydantic import BaseModel, Field
 from sqlalchemy import select, func
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timedelta
-from typing import Optional, List
+from typing import Optional, List, Dict
 from ..models import CheckIn
 from ..main import database, metadata
 from ..routers.mood import MOODS
+import logging
+import httpx
+from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/checkin", tags=["checkin"])
 
@@ -22,37 +27,47 @@ class CheckInResponse(BaseModel):
     stress_level: int
     note: Optional[str] = None
 
-@router.post("", response_model=CheckInResponse)
-async def create_checkin(checkin: CheckInRequest):
+async def start_breathing_session():
+    """Start a breathing session in the background"""
     try:
-        # Validate mood ID
-        if not any(m.id == checkin.moodId for m in MOODS):
-            raise HTTPException(status_code=400, detail="Invalid mood ID")
+        async with httpx.AsyncClient() as client:
+            response = await client.post("http://localhost:8000/api/breathing/start")
+            response.raise_for_status()
+    except Exception as e:
+        logger.error(f"Failed to start breathing session: {e}")
 
-        # Create check-in record
-        query = CheckIn.__table__.insert().values(
-            mood_id=checkin.moodId,
-            stress_level=checkin.stressLevel,
-            note=checkin.note
+@router.post("")
+async def create_checkin(
+    checkin: Dict,
+    background_tasks: BackgroundTasks,
+    db: Session
+) -> Dict:
+    """Create a new check-in"""
+    try:
+        # Create check-in
+        db_checkin = CheckIn(
+            timestamp=datetime.now(),
+            mood_id=checkin["moodId"],
+            stress_level=checkin["stressLevel"],
+            note=checkin.get("note")
         )
+        db.add(db_checkin)
+        db.commit()
         
-        async with database.transaction():
-            result = await database.execute(query)
-            checkin_id = result.lastrowid
-            
-            # Fetch the created record
-            query = select(CheckIn).where(CheckIn.id == checkin_id)
-            result = await database.fetch_one(query)
-            
-            return CheckInResponse(
-                id=result.id,
-                timestamp=result.timestamp,
-                mood_id=result.mood_id,
-                stress_level=result.stress_level,
-                note=result.note
-            )
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=503, detail="Service temporarily unavailable")
+        # If stress level is high, start breathing session
+        if checkin["stressLevel"] >= 4:
+            background_tasks.add_task(start_breathing_session)
+        
+        return {
+            "id": db_checkin.id,
+            "timestamp": db_checkin.timestamp.isoformat(),
+            "moodId": db_checkin.mood_id,
+            "stressLevel": db_checkin.stress_level,
+            "note": db_checkin.note
+        }
+    except Exception as e:
+        logger.error(f"Error creating check-in: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get("/today", response_model=Optional[CheckInResponse])
 async def get_today_checkin():
