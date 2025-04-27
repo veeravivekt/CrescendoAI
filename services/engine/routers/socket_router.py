@@ -8,6 +8,12 @@ import redis
 from datetime import datetime
 from typing import Dict, Any
 import httpx
+import google.generativeai as genai
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -20,6 +26,53 @@ redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
 # Initialize HTTP client for inference service
 http_client = httpx.AsyncClient()
+
+# Configure Gemini API
+genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+model = genai.GenerativeModel('gemini-pro')
+
+async def analyze_mood_with_gemini(metrics: Dict[str, Any]) -> str:
+    """Analyze mood using Gemini API based on behavioral metrics"""
+    try:
+        # Prepare prompt for Gemini
+        prompt = f"""
+        Analyze the following behavioral metrics and determine the most likely mood:
+        {json.dumps(metrics, indent=2)}
+        
+        Consider factors like:
+        - Activity level
+        - Heart rate
+        - Interaction patterns
+        - Time of day
+        - Previous mood states
+        
+        Return a single mood identifier from this list:
+        - happy
+        - calm
+        - energetic
+        - focused
+        - relaxed
+        - stressed
+        - sad
+        - anxious
+        
+        Only return the mood identifier, nothing else.
+        """
+        
+        # Get response from Gemini
+        response = await model.generate_content_async(prompt)
+        mood_id = response.text.strip().lower()
+        
+        # Validate mood_id
+        valid_moods = {'happy', 'calm', 'energetic', 'focused', 'relaxed', 'stressed', 'sad', 'anxious'}
+        if mood_id not in valid_moods:
+            logger.warning(f"Invalid mood detected from Gemini: {mood_id}")
+            return 'neutral'
+            
+        return mood_id
+    except Exception as e:
+        logger.error(f"Error in Gemini mood analysis: {e}")
+        return 'neutral'
 
 @sio.event
 async def connect(sid, environ):
@@ -36,13 +89,8 @@ async def metrics(sid, data: Dict[str, Any]):
         if not isinstance(data, dict):
             raise ValueError("Invalid metrics format")
         
-        # Call inference service
-        response = await http_client.post(
-            "http://localhost:8001/infer",
-            json=data
-        )
-        response.raise_for_status()
-        mood_id = response.json()["moodId"]
+        # Get mood from Gemini API
+        mood_id = await analyze_mood_with_gemini(data)
         
         # Get current AI mood from Redis
         current_mood = redis_client.get("current_mood_ai")
