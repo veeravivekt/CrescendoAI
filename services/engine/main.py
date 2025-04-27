@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 import os
 import logging
 from typing import Dict, Any
-from routers import mood
+from routers import mood, checkin, feedback, player
+from models import Base
 
 # Load environment variables
 load_dotenv()
@@ -52,6 +53,9 @@ app.mount("/ws", socket_app)
 
 # Include routers
 app.include_router(mood.router)
+app.include_router(checkin.router)
+app.include_router(feedback.router)
+app.include_router(player.router)
 
 # Global exception handler
 @app.exception_handler(Exception)
@@ -68,7 +72,8 @@ async def health_check() -> Dict[str, str]:
 @app.on_event("startup")
 async def startup():
     await database.connect()
-    logger.info("Database connected")
+    await checkin.init_db()
+    logger.info("Database connected and initialized")
 
 # Shutdown event
 @app.on_event("shutdown")
