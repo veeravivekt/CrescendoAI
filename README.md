@@ -1,7 +1,7 @@
 # CrescendoAI
 
 <div align="center">
-  <img src="images/CrescendoAILogo.png" alt="CrescendoAI Logo" width="300"/>
+  <img src="Images/CrescendoAILogo.png" alt="CrescendoAI Logo" width="300"/>
 </div>
 
 ## 🎵 Intelligent Music Experience
@@ -13,27 +13,27 @@ CrescendoAI is an innovative music platform that combines behavioral analysis, m
 ### 🎯 Real-time Mood Detection
 Our advanced behavioral pipeline, powered by Google's Gemini API, analyzes your interactions and physiological metrics to detect your current mood state with unprecedented accuracy. The system then intelligently adjusts music recommendations to match your emotional needs.
 
-![Behavioral Insights](images/BehavioralInsights.png)
+![Behavioral Insights](Images/BehavioralInsights.png)
 
 ### 🎨 Intuitive User Interface
 Experience a seamless and beautiful interface designed for effortless music discovery and mood tracking.
 
-![Main UI](images/MainUI.png)
+![Main UI](Images/MainUI.png)
 
 ### 📊 Comprehensive Mood Analytics
 Track your emotional journey with detailed mood history and insights. Our system provides valuable analytics to help you understand your emotional patterns.
 
-![Mood History](images/MoodHistory.png)
+![Mood History](Images/MoodHistory.png)
 
 ### 📈 Mood Distribution & Insights
 Get a clear overview of your mood patterns with our comprehensive mood distribution analysis.
 
-![Mood Summary](images/MoodSummary.png)
+![Mood Summary](Images/MoodSummary.png)
 
 ### 🎼 Smart Queue Management
 Our intelligent queue system adapts to your preferences and current mood, ensuring a continuous flow of perfectly matched music.
 
-![Up Next Sidebar](images/UpNextSidebar.png)
+![Up Next Sidebar](Images/UpNextSidebar.png)
 
 ### 🧘‍♂️ Integrated Wellness Features
 When stress levels are detected, our system automatically suggests breathing exercises to help you relax and maintain emotional balance.
@@ -117,7 +117,7 @@ Customize your experience with:
 ---
 
 <div align="center">
-  <img src="images/BehavioralInsightswithFullUI.png" alt="Full UI with Behavioral Insights" width="800"/>
+  <img src="Images/BehavioralInsightswithFullUI.png" alt="Full UI with Behavioral Insights" width="800"/>
 </div>
 
 *Experience the future of intelligent music listening with CrescendoAI* 
